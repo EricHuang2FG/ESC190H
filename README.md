@@ -1,0 +1,1 @@
+How long would it take until I go insane?
