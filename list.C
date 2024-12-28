@@ -118,6 +118,23 @@ int count(struct Node* head, int target) {
     return tot;
 }
 
+int get(struct Node* head, int index) {
+    if (head == NULL) {
+        printf("ERROR: Empty list\n");
+        return -1;
+    }
+    int i = 0;
+    while (head) {
+        if (i == index) {
+            return head->val;
+        }
+        i++;
+        head = head->next;
+    }
+    printf("ERROR: List index out of range\n"); // not found
+    return -1;
+}
+
 int main() {
     我靠;
     struct Node* head = NULL;
