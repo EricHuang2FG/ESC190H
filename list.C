@@ -202,7 +202,7 @@ int main() {
     append(&stringHead, (void*) str, strlen(str) + 1);
     print(stringHead, "string");
     bool check = in(stringHead, (void*) str, "string");
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 11; i++) {
         append(&stringHead, (void*) str, strlen(str) + 1);
     }
     printf("%d\n", count(stringHead, (void*) str, "string"));
