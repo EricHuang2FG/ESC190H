@@ -1,30 +1,50 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define 我靠 printf("It's ok\n");
 
 struct Node {
-    int val;
+    void* val;
     struct Node* next;
 };
 
-void print(struct Node* head) {
+void print(struct Node* head, char* type) {
     printf("[");
     while (head) {
-        if (!head->next) {
-            printf("%d", head->val);
+        if (strcmp(type, "char") == 0) {
+            printf("%c", *(char*)head->val);
+        } else if (strcmp(type, "int") == 0) {
+            printf("%d", *(int*)head->val);
+        } else if (strcmp(type, "float") == 0 || strcmp(type, "double") == 0) {
+            printf("%f", *(float*)head->val);
+        } else if (strcmp(type, "long") == 0) {
+            printf("%ld", *(long*)head->val);
+        } else if (strcmp(type, "long long") == 0) {
+            printf("%lld", *(long long*)head->val);
+        } else if (strcmp(type, "unsigned int") == 0) {
+            printf("%u", *(unsigned int*)head->val);
+        } else if (strcmp(type, "unsigned long") == 0) {
+            printf("%lu", *(unsigned long*)head->val);
+        } else if (strcmp(type, "string") == 0) {
+            printf("%s", (char*)head->val);
         } else {
-            printf("%d, ", head->val);
+            printf("ERROR: Unsupported type\n");
+            return;
         }
+        if (head->next) {
+            printf(", ");
+        } 
         head = head->next;
     }
     printf("]\n");
 }
 
-void append(struct Node** head, int num) {
+void append(struct Node** head, void* newVal, size_t valSize) {
     struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
-    newNode->val = num;
+    newNode->val = malloc(valSize);
+    memcpy(newNode->val, newVal, valSize);
     newNode->next = NULL;
     if (!(*head)) {
         (*head) = newNode;
@@ -46,24 +66,25 @@ int len(struct Node* head) {
     return length;
 }
 
-int pop(struct Node** head, int targetIndex) {
-    // return value of -1 means exiting with error
+void* pop(struct Node** head, int targetIndex) {
+    // return value of NULL means exiting with error
     if (*head == NULL) {
         printf("ERROR: Empty list\n");
-        return -1;
+        return NULL;
     }
 
     int length = len(*head);
-    int targetVal;
+    void* targetVal;
     struct Node* temp;
     if (targetIndex >= length) {
         printf("ERROR: List index out of range\n");
-        return -1;
+        return NULL;
     }
     if (targetIndex == 0) {
         targetVal = (*head)->val;
         temp = *head;
         *head = (*head)->next;
+        free(temp->val);
         free(temp);
         return targetVal;
     }
@@ -75,6 +96,7 @@ int pop(struct Node** head, int targetIndex) {
             targetVal = currNode->val;
             temp = currNode;
             prevNode->next = currNode->next;
+            free(temp->val);
             free(temp);
             return targetVal;
         }
@@ -82,12 +104,34 @@ int pop(struct Node** head, int targetIndex) {
         currNode = currNode->next;
         i++;
     }
-    return -1; // by default, return an error code
+    return NULL; // by default, return the NULL pointer
 }
 
-bool in(struct Node* head, int target) {
+bool match(void* a, void* b, char* type) {
+    if (strcmp(type, "char") == 0) {
+        return *(char*) a == *(char*) b;
+    } else if (strcmp(type, "int") == 0) {
+        return *(int*) a == *(int*) b;
+    } else if (strcmp(type, "float") == 0 || strcmp(type, "double") == 0) {
+        return *(float*) a == *(float*) b;
+    } else if (strcmp(type, "long") == 0) {
+        return *(long*) a == *(long*) b;
+    } else if (strcmp(type, "long long") == 0) {
+        return *(long long*) a == *(long long*) b;
+    } else if (strcmp(type, "unsigned int") == 0) {
+        return *(unsigned int*) a == *(unsigned int*) b;
+    } else if (strcmp(type, "unsigned long") == 0) {
+        return *(unsigned long*) a == *(unsigned long*) b;
+    } else if (strcmp(type, "string") == 0) {
+        return strcmp((char*) a, (char*) b) == 0;
+    }
+    printf("ERROR: Unsupported type\n");
+    return false;
+}
+
+bool in(struct Node* head, void* target, char* type) {
     while (head) {
-        if (head->val == target) {
+        if (match(head->val, target, type)) {
             return true;
         }
         head = head->next;
@@ -95,10 +139,10 @@ bool in(struct Node* head, int target) {
     return false;
 }
 
-int indexOf(struct Node* head, int target) {
+int indexOf(struct Node* head, void* target, char* type) {
     int i = 0;
     while (head) {
-        if (head->val == target) {
+        if (match(head->val, target, type)) {
             return i;
         }
         i++;
@@ -107,10 +151,10 @@ int indexOf(struct Node* head, int target) {
     return -1; // not found
 }
 
-int count(struct Node* head, int target) {
+int count(struct Node* head, void* target, char* type) {
     int tot = 0;
     while (head) {
-        if (head->val == target) {
+        if (match(head->val, target, type)) {
             tot++;
         }
         head = head->next;
@@ -118,10 +162,10 @@ int count(struct Node* head, int target) {
     return tot;
 }
 
-int get(struct Node* head, int index) {
+void* get(struct Node* head, int index) {
     if (head == NULL) {
         printf("ERROR: Empty list\n");
-        return -1;
+        return NULL;
     }
     int i = 0;
     while (head) {
@@ -132,18 +176,36 @@ int get(struct Node* head, int index) {
         head = head->next;
     }
     printf("ERROR: List index out of range\n"); // not found
-    return -1;
+    return NULL;
 }
 
 int main() {
+    // testing
     我靠;
     struct Node* head = NULL;
-    append(&head, 5);
-    append(&head, 100);
-    print(head);
-    int node = pop(&head, 1);
-    print(head);
-    printf("%d", node);
+    int toAdd = 5;
+    append(&head, (void*) &toAdd, sizeof(toAdd));
+    append(&head, (void*) &toAdd, sizeof(toAdd));
+    toAdd = 123;
+    append(&head, (void*) &toAdd, sizeof(toAdd));
+    int lastVal = *((int*) pop(&head, len(head) - 1));
+    print(head, "int");
+    printf("%d\n", lastVal);
+    printf("%d\n", count(head, (void*) &toAdd, "int"));
+    toAdd = 5;
+    printf("%d\n", count(head, (void*) &toAdd, "int"));
+
+    struct Node* stringHead = NULL;
+    char* str = "hello world";
+    append(&stringHead, (void*) str, strlen(str) + 1);
+    str = "goodbye world lol";
+    append(&stringHead, (void*) str, strlen(str) + 1);
+    print(stringHead, "string");
+    bool check = in(stringHead, (void*) str, "string");
+    for (int i = 0; i < 10; i++) {
+        append(&stringHead, (void*) str, strlen(str) + 1);
+    }
+    printf("%d\n", count(stringHead, (void*) str, "string"));
     我靠;
     return 0;
 }
