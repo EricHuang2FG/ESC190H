@@ -101,6 +101,10 @@ void pointerArithmetic() {
     // something like arr[5] is really *(arr + 5);
 }
 
+void change_arr0(int* p_a) {
+    *p_a = 43;
+}
+
 int main() {
     cStrings();
     printAddress();
@@ -109,5 +113,11 @@ int main() {
     pointerToFunction();
     arrays();
     pointerArithmetic();
+
+    int arr[3] = {5, 6, 7};
+    change_arr0(arr); // this sends the pointer to the first element
+    // arr is same as &(arr[0])
+    // also the same as &(*arr)
+    
     return 0;
 }
