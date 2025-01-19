@@ -105,6 +105,87 @@ void change_arr0(int* p_a) {
     *p_a = 43;
 }
 
+void constChar() {
+    // char* s1 = "abc"; // warning; implicit conversion to char*
+    //                     // not allowed to modify the contents of a const char*
+    //                     // go to address s and modify the contents there
+    // s1[0] = 'x'; // will compile, but might crash at runtime
+
+    const char* s2 = "abc"; // s2 is the address of 'a'
+                            // not allowed to modify contents as s2
+                            // the compiler will yell at you
+    s2 = "zbc"; // allowed: not changing the contents at s2. Instead, it just changes s2 entirely
+
+    char s1[] = "abc"; // array of characters
+    s1[0] = 'z';
+    printf("%s\n", s1); // works
+
+    // char* s3 = "abc"; // implicitly converted to a constant
+    // s3[0] = 'd';
+    // printf("%s\n", s3); // doesn't work
+
+    const char* const str = "hello";
+    // the first const means the content is constant
+    // the second const means the address is constant
+}
+
+// void moreOnStrings() {
+//     // 1. works fine
+//     // 2. would not compile
+//     // 3. undefined behaviour: might crash at runtime
+
+//     // remember:
+//     // the first const means the content is constant
+//     // the second const means the address is constant
+
+//     const int a = 5;
+//     a = 6; // 2
+
+//     char* s = "abc";
+//     s = "def"; // 1
+
+//     const char* s1 = "abc";
+//     s1 = "def"; // 1. Modifying address is ok
+//     s1[0] = 'x'; // 2. Modifying value is not ok
+
+//     const char* const s2 = "abc";
+//     s2 = "def"; // 2
+
+//     char* const s3 = "abc";
+//     s3 = "def"; // 2
+//     s3[0] = 'x' // 1
+
+// }
+
+void changeNum(int* num) {
+    *num = 10086;
+}
+
+void inClassPracticeJan15() {
+    int a = 42;
+    int* p_a = &a;
+    *p_a = 43;
+
+    int num = 43;
+    p_a = &num;
+
+    changeNum(&a);
+    printf("%d\n", a);
+}
+
+void printing() {
+    char* s1 = "abc";
+    printf("%c\n", s1); // prints weird things
+    printf("%c\n", *s1); // prints 'a'
+    printf("%c\n", s1[0]); // prints 'a'
+    printf("%s\n", s1 + 1); // prints "bc"
+}
+
+void dont_change_pa(int* p_a) {
+    int i = 45;
+    p_a = &i; // p_a got assigned a new address
+}
+
 int main() {
     cStrings();
     printAddress();
@@ -118,6 +199,13 @@ int main() {
     change_arr0(arr); // this sends the pointer to the first element
     // arr is same as &(arr[0])
     // also the same as &(*arr)
-    
+
+    constChar();
+    inClassPracticeJan15();
+    printing();
+
+    int a = 50;
+    dont_change_pa(&a);
+
     return 0;
 }
